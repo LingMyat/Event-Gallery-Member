@@ -1,13 +1,13 @@
-import axios from "../../axios";
+import axios from "../axios";
 
-exports.eventList = () => {
+export const eventList = () => {
     return axios.get('/events');
 }
 
-exports.eventDetail = (event) => {
+export const eventDetail = (event) => {
     return axios.get(`/events/${event}`);
 }
 
-exports.uploadPhoto = ({event, data}) => {
+export const uploadPhoto = ({event, data}) => {
     return axios.post(`/events/${event}/photos`, data);
 }

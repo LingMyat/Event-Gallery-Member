@@ -59,6 +59,9 @@ import axios from "../../axios";
 import { useRouter } from 'vue-router';
 const router = useRouter();
 
+import { useAuthStore } from '../../stores/AuthStore';
+const authStore = useAuthStore();
+
 const loginSubmit = async () => {
 
     emailErr.value = email.value ? '' : 'Email address is required';
@@ -75,9 +78,10 @@ const loginSubmit = async () => {
 
             axios.defaults.headers.common['Authorization'] = 'Bearer ' + res.data.token;
 
-            localStorage.setItem('login', true);
-            localStorage.setItem('name', res.data.name);
-            localStorage.setItem('token', res.data.token);
+            authStore.setToken(res.data.token);
+            authStore.setName(res.data.name);
+            authStore.setEmail(res.data.email);
+            authStore.setIsLogin(true);
 
             setTimeout(() => router.push({name: 'home'}));
         } catch (err) {
