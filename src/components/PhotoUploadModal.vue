@@ -30,18 +30,26 @@
                     <div class="p-5 h-full">
                         <h1 class="text-2xl font-medium mb-2">Upload Photo</h1>
 
-                        <FileInput :clear="fileClear" placeholder="Upload Photo" accept="image/*" @on-change="onChange"/>
+                        <div v-show="authStore.isLogin">
+                            <FileInput :clear="fileClear" placeholder="Upload Photo" accept="image/*" @on-change="onChange"/>
 
-                        <div v-show="!isFormEmpty" class="mt-4 flex gap-3 justify-end">
-                            <button @click="clearPhoto" type="button" class="text-white bg-red-600 hover:bg-red-500 font-medium rounded-lg text-xs px-4 py-2 text-center inline-flex items-center">
+                            <div v-if="!isFormEmpty" class="mt-4 flex gap-3 justify-end">
+                                <button @click="clearPhoto" type="button" class="text-white bg-red-600 hover:bg-red-500 font-medium rounded-lg text-xs px-4 py-2 text-center inline-flex items-center">
 
-                                Clear
-                            </button>
+                                    Clear
+                                </button>
 
-                            <button @submit="submit" type="button" class="text-white bg-[#24292F] hover:bg-[#24292F]/90 font-medium rounded-lg text-xs px-4 py-2 text-center inline-flex items-center">
+                                <button @click="submit" type="button" class="text-white bg-[#24292F] hover:bg-[#24292F]/90 font-medium rounded-lg text-xs px-4 py-2 text-center inline-flex items-center">
 
-                                Submit
-                            </button>
+                                    Submit
+                                </button>
+                            </div>
+                        </div>
+
+                        <div v-show="!authStore.isLogin">
+                            <h1 class="text-xl font-medium">
+                                Please login to upload !
+                            </h1>
                         </div>
                     </div>
                 </div>
@@ -56,11 +64,16 @@ import { ref } from 'vue';
 import FileInput from './form-element/FileInput.vue';
 import { uploadPhoto } from '../api/index';
 
+import { useAuthStore } from '../stores/AuthStore';
+const authStore = useAuthStore();
+
 const show = ref(false);
 const isFormEmpty = ref(true);
 const fileClear   = ref(false);
 
 const props = defineProps({eventId: String});
+
+const emits = defineEmits(['uploaded']);
 
 let form;
 
@@ -76,12 +89,16 @@ const onChange = (formData) => {
 const submit = async () => {
     if(!isFormEmpty.value) {
         try {
-            const res = await uploadPhoto({
+            await uploadPhoto({
                 event: props.eventId,
                 data : form
             });
-        } catch (error) {
+
+            emits('uploaded', true);
             
+            clearPhoto();
+        } catch (error) {
+            console.log(error);
         }
     }
 }
@@ -95,10 +112,13 @@ const clearPhoto = () => {
 const closeModal = () => {
     show.value = false;
     
-    //Use setTimeout for Better UI transition 
-    setTimeout(() => {
-        clearPhoto();
-    }, 600);
+    if(!isFormEmpty.value || !fileClear.value) {
+        //Use setTimeout for Better UI transition 
+        setTimeout(() => {
+            clearPhoto();
+        }, 600);
+    }
+    
 }
 </script>
 

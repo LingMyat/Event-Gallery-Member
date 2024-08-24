@@ -22,6 +22,11 @@ const router = createRouter({
             path: "/event/:event",
             name: "event-detail",
             component: () => import('../pages/EventDetail.vue'),
+        },
+        {
+            path: "/event/:event/gallery",
+            name: "event-gallery",
+            component: () => import('../pages/EventGallery.vue'),
         }
     ],
 });

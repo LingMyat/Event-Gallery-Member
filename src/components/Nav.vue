@@ -42,8 +42,8 @@
                                     <p class="text font-medium">{{ authStore.name }}</p>
                                     <p class="text-sm">{{ authStore.email }}</p>
                                 </div>
-                                <a href="#" class="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabindex="-1"
-                                    id="user-menu-item-2">Sign out</a>
+                                <button @click="loggingOut" class="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabindex="-1"
+                                    id="user-menu-item-2">Sign out</button>
                             </div>
                         </div>
                     </div>
@@ -74,8 +74,10 @@
         <div v-show="isOpen" class="md:hidden" id="mobile-menu">
             <div class="space-y-1 px-2 pb-3 pt-2 sm:px-3">
                 <RouterLink :to="{name: 'home'}" class="block rounded-md px-3 py-2 text-base font-medium text-gray-600 hover:bg-gray-200">Home</RouterLink>
+
+                <RouterLink v-show="!authStore.isLogin" :to="{name: 'login'}" class="block rounded-md px-3 py-2 text-base font-medium text-gray-600 hover:bg-gray-200">Login</RouterLink>
             </div>
-            <div class="border-t border-gray-700 pb-3 pt-4">
+            <div v-show="authStore.isLogin" class="border-t border-gray-700 pb-3 pt-4">
                 <div class="flex items-center px-5">
                     <div class="flex items-center justify-center w-10 h-10 rounded-full border-2 border-gray-800">
                         {{ avatarText }}
@@ -90,10 +92,10 @@
                     </div>
                 </div>
                 <div class="mt-3 space-y-1 px-2">
-                    <a href="#"
+                    <button @click="loggingOut"
                         class="block rounded-md px-3 py-2 text-base font-medium text-gray-620 hover:bg-gray-200">
                         Sign out
-                    </a>
+                    </button>
                 </div>
             </div>
         </div>
@@ -108,6 +110,19 @@ const isLogin = ref(false);
 
 import { useAuthStore } from '../stores/AuthStore';
 const authStore = useAuthStore();
+
+import { logout } from '../api/auth'
+
+const loggingOut = () => {
+    isOpen.value = false;
+
+    authStore.setName('');
+    authStore.setEmail('');
+    authStore.setIsLogin(false);
+    authStore.setToken('');
+
+    logout();
+}
 
 const avatarText = computed(() => {
     const nameArr = authStore.name.split(' ');
